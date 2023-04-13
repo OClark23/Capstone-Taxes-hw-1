@@ -1,30 +1,29 @@
 package checkout
 
 const (
-	njTaxRate    = 0.066   // 6.6%
-	paTaxRate    = 0.06    // 6%
 	wicExempt    = "Wic Eligible food"
 	clothingExem = "Clothing"
 	fur          = "fur"
 )
 
 type Item struct {
-	Name string
+	Name  string
 	Price float64
-	Type string
+	Type  string
+}
+
+type TaxRateMap map[string]float64
+
+var taxRates = TaxRateMap{
+	"NJ": 0.066,   // 6.6%
+	"PA": 0.06,    // 6%
+	"DE": 0,       // no sales tax
 }
 
 func Checkout(state string, items []Item) (float64, error) {
 	var total float64
-	var taxRate float64
-	switch state {
-	case "NJ":
-		taxRate = njTaxRate
-	case "PA":
-		taxRate = paTaxRate
-	case "DE":
-		taxRate = 0
-	default:
+	taxRate, ok := taxRates[state]
+	if !ok {
 		return 0, fmt.Errorf("state %s not supported", state)
 	}
 	for _, item := range items {
